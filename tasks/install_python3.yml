@@ -1,0 +1,28 @@
+---
+- name: Install Python 3 on CentOS and Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Python 3 on CentOS
+      yum:
+	      name: python3
+        state: present
+      register: python3_install
+      when: ansible_os_family == "RedHat"
+    - name: Install Python 3 on Ubuntu
+      apt:
+	      name: python3
+        state: present
+      register: python3_install
+      when: ansible_os_family == "Debian"
+    - name: Log Python 3 Installation Locally
+      lineinfile:
+        path: "/var/log/python_installations.log"
+        line: "Python 3 installed on {{ ansible_date_time.iso8601 }}"
+      when: python3_install.changed
+    - name: Log Python 3 Installation on Master
+      delegate_to: localhost
+      lineinfile:
+        path: "~/ansible_logs/python_installations.log"
+        line: "Python 3 installed on {{ inventory_hostname }} at {{ ansible_date_time.iso8601 }}"
+      when: python3_install.changed

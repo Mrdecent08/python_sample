@@ -1,0 +1,17 @@
+---
+- name: Update and Patch Linux Servers
+  hosts: servers
+  become: yes
+  vars:
+    ansible_debug: 1
+  tasks:
+    - name: Ensure the system is up to date
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+    - name: Ensure the system is up to date
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "RedHat"

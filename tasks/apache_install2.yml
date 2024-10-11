@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    apache_package_name_ubuntu: apache2
+    apache_package_name_centos: httpd
+  tasks:
+    - name: Install Apache on Ubuntu hosts
+      apt:
+	      name: "{{ apache_package_name_ubuntu }}"
+        state: present
+      when: ansible_distribution == "Ubuntu"
+    - name: Install Apache on CentOS hosts
+      yum:
+	      name: "{{ apache_package_name_centos }}"
+        state: present
+      when: ansible_distribution == "CentOS"
+    - name: Start and enable Apache service
+      service:
+	      name: "{{ apache_service_name }}"
+        state: started
+        enabled: yes
+      vars:
+	      apache_service_name: "{{ 'apache2' if ansible_distribution == 'Ubuntu' else 'httpd' }}"
